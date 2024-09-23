@@ -1,7 +1,49 @@
-﻿<div class="container">
-    
+﻿<div class="row container pt-4">
+    <div class="col">
+        <button @onclick="() => Move(-1)">Left</button>
+    </div>
+    @for(int i = 0; i < Products.Count; i++)
+    {
+        if(SelectedProduct == Products[i])
+        {
+            <ProductBlock Product="Products[i]" IsSelected="true"></ProductBlock>
+        } else
+        {
+            <ProductBlock Product="Products[i]"></ProductBlock> 
+        }
+    }
+    <div class="col">
+        <button @onclick="() => Move(1)">Right</button>
+    </div>
 </div>
 
 @code {
+    [Parameter]
+    public List<Product> Products { get; set; } = new();
 
+    public Product SelectedProduct { get; set; }
+
+    public int SelectedProductIndex { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+            if (!Products.Any()) return;
+            var index = Products.Count / 2;
+            SelectedProduct = Products[index];
+            SelectedProductIndex = index;
+        }
+    }
+
+    protected void Move(int shift)
+    {
+        var moveResult = SelectedProductIndex + shift;
+        if(moveResult > 0 && moveResult < Products.Count - 1)
+        {
+            SelectedProduct = Products[moveResult];
+            SelectedProductIndex = moveResult;
+            StateHasChanged();
+        }
+    }
 }

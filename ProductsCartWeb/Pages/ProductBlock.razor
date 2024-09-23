@@ -1,8 +1,27 @@
-﻿
-<div class="container pt-5">
-    <h1>@(_product.N)</h1>
-</div>
+﻿@if(IsSelected)
+{
+    <div class="col row bg-success container">
+        <h2>
+            @(Product.Name)
+        </h2>
+        <p>@(Product.Name)</p>
+    </div>
+} else
+{
+    <div class="col row bg-info container">
+        <h2>
+            @(Product.Name)
+        </h2>
+        <p>@(Product.Name)</p>
+    </div>
+}
+
 
 @code {
-    private Product product;
+
+    [Parameter]
+    public Product Product { get; set; }
+
+    [Parameter]
+    public bool IsSelected { get; set; } = false;
 }

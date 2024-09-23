@@ -1,3 +1,23 @@
-﻿@page "/"
+﻿@inject IProductRepository ProductsRepository
+@page "/"
+@using ProductsCartWeb.Repository.Interfaces
 
-<ProductsRow></ProductsRow>
+<div class="container pt-5">
+    @foreach(var productsRow in ProductsRows)
+    {
+        <ProductsRow Products="productsRow"></ProductsRow>
+    }
+</div>
+
+@code {
+    List<List<Product>> ProductsRows = new ();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ProductsRows.Add(await ProductsRepository.GetAllAsync());
+        ProductsRows.Add(await ProductsRepository.GetAllAsync());
+        ProductsRows.Add(await ProductsRepository.GetAllAsync());
+        ProductsRows.Add(await ProductsRepository.GetAllAsync());
+        await base.OnInitializedAsync();
+    }
+}
