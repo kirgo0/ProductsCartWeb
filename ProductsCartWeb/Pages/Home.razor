@@ -2,22 +2,51 @@
 @page "/"
 @using ProductsCartWeb.Repository.Interfaces
 
-<div class="container pt-5">
-    @foreach(var productsRow in ProductsRows)
-    {
-        <ProductsRow Products="productsRow"></ProductsRow>
-    }
+<div class="container">
+    <div>
+        <p>Total Price: @TotalPrice</p>
+    </div>
+    <div class="flex flex-col gap-4">
+        @foreach(var row in ProductsRows)
+        {
+            <ProductsRow Products="row"></ProductsRow>
+        }
+    </div>
+    <div class="flex justify-center">
+       
+        <button @onclick="AddRow"
+            type="button"
+                class="inline-block rounded border-2 border-primary px-6 pb-[6px] pt-2 text-xs font-medium uppercase leading-normal text-primary transition duration-150 ease-in-out hover:border-primary-accent-300 hover:bg-primary-50/50 hover:text-primary-accent-300 focus:border-primary-600 focus:bg-primary-50/50 focus:text-primary-600 focus:outline-none focus:ring-0 active:border-primary-700 active:text-primary-700 motion-reduce:transition-none dark:text-primary-500 dark:hover:bg-blue-950 dark:focus:bg-blue-950"
+                data-twe-ripple-init>
+            Додати
+        </button>
+    </div>
+
 </div>
 
 @code {
     List<List<Product>> ProductsRows = new ();
 
+    public double TotalPrice => 0;
+
     protected override async Task OnInitializedAsync()
     {
-        ProductsRows.Add(await ProductsRepository.GetAllAsync());
-        ProductsRows.Add(await ProductsRepository.GetAllAsync());
-        ProductsRows.Add(await ProductsRepository.GetAllAsync());
+        ProductsRows.Add((await ProductsRepository.GetAllAsync()).Take(1).ToList());
+        ProductsRows.Add((await ProductsRepository.GetAllAsync()).Take(2).ToList());
+        ProductsRows.Add((await ProductsRepository.GetAllAsync()).Take(3).ToList());
+        ProductsRows.Add((await ProductsRepository.GetAllAsync()).Take(4).ToList());
+        ProductsRows.Add((await ProductsRepository.GetAllAsync()).Take(5).ToList());
         ProductsRows.Add(await ProductsRepository.GetAllAsync());
         await base.OnInitializedAsync();
+    }
+
+    private void AddRow()
+    {
+        ProductsRows.Add(new List<Product>
+        {
+            new Product { Id = Guid.NewGuid().ToString(), Name = "New Product", Description = "Description", Price = 0.0 }
+        });
+
+        StateHasChanged();
     }
 }

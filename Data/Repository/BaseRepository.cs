@@ -1,13 +1,13 @@
 ﻿namespace Data.Repository
 {
-    public class BaseRepository<T, TId> : IRepository<T, TId> where T : class
+    public class BaseRepository<T> : IRepository<T> where T : class
     {
-        public virtual Task<T> GetAsync(TId id)
+        public virtual Task<T> GetAsync(string id)
         {
             throw new NotImplementedException();
         }
 
-        public virtual Task<List<T>> GetRangeAsync(List<TId> ids)
+        public virtual Task<List<T>> GetRangeAsync(List<string> ids)
         {
             throw new NotImplementedException();
         }

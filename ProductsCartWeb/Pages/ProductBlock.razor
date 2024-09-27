@@ -1,23 +1,14 @@
-﻿@if(IsSelected)
-{
-    <div class="col row bg-success container">
-        <h2>
-            @(Product.Name)
-        </h2>
-        <p>@(Product.Name)</p>
+﻿<div class="@Class @(IsSelected ? "bg-sky-200 scale-105" : "bg-gray-200") p-3 flex justify-between flex-col gap-1 rounded shadow-sm">
+    <div class="w-full">
+        <div class="font-bold">@(Product.Name)</div>
+        <div class="text-xs">@(Product.Description)</div>
     </div>
-} else
-{
-    <div class="col row bg-info container">
-        <h2>
-            @(Product.Name)
-        </h2>
-        <p>@(Product.Name)</p>
-    </div>
-}
-
+    <div>@Product.Price UAH</div>
+</div>
 
 @code {
+    [Parameter]
+    public string Class { get; set; }
 
     [Parameter]
     public Product Product { get; set; }

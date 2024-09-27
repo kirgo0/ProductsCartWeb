@@ -1,23 +1,51 @@
-﻿<div class="row container pt-4">
-    <div class="col">
-        <button @onclick="() => Move(-1)">Left</button>
-    </div>
-    @for(int i = 0; i < Products.Count; i++)
+﻿<div class="grid @($"grid-cols-{MaxVisibleElements*2+1}") gap-4" @onmouseenter="ShowAddProductButton" @onmouseleave="HideAddProductButton">
+    @if(SelectedProductIndex-LeftBoundary < MaxVisibleElements)
     {
-        if(SelectedProduct == Products[i])
+        for (int i = 0; i < MaxVisibleElements - SelectedProductIndex - LeftBoundary; i++)
         {
-            <ProductBlock Product="Products[i]" IsSelected="true"></ProductBlock>
-        } else
-        {
-            <ProductBlock Product="Products[i]"></ProductBlock> 
+            <div> </div>
         }
     }
-    <div class="col">
-        <button @onclick="() => Move(1)">Right</button>
-    </div>
+    @for (int i = LeftBoundary, j = Math.Abs(SelectedProductIndex - LeftBoundary - MaxVisibleElements) + 2; i < SelectedProductIndex; i++, j++)
+    { 
+        <ProductBlock Class="@($"opacity-{j*25}")" Product="Products[i]" />
+    }
+    <ProductBlock Class=@($"col-start-{MaxVisibleElements+1}") Product="Products[SelectedProductIndex]" IsSelected="true" />
+    @for (int i = SelectedProductIndex + 1, j = MaxVisibleElements+1; i <= RightBoundary; i++, j--)
+    {
+        <ProductBlock Class="@($"opacity-{j*25}")" Product="Products[i]" />
+    }
+    @if(AddButtonVisible)
+    {
+        @if(RightBoundary - SelectedProductIndex < MaxVisibleElements)
+        {
+            <div class="flex justify-center align-items-center">
+                <button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm p-4 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                    <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9" />
+                    </svg>
+                    <span class="sr-only">Icon description</span>
+                </button>
+            </div>
+        }
+        <div class="absolute right-20 ">
+            
+        </div>
+    }
 </div>
 
+
 @code {
+    private bool AddButtonVisible = false;
+
+    private int MaxVisibleElements = 3;
+    private int LeftBoundary => 
+    SelectedProductIndex - MaxVisibleElements > 0 ? 
+    SelectedProductIndex - MaxVisibleElements : 0;
+    private int RightBoundary => 
+    SelectedProductIndex + MaxVisibleElements <= Products.Count - 1 ? 
+    SelectedProductIndex + MaxVisibleElements : Products.Count - 1;
+
     [Parameter]
     public List<Product> Products { get; set; } = new();
 
@@ -33,6 +61,7 @@
             var index = Products.Count / 2;
             SelectedProduct = Products[index];
             SelectedProductIndex = index;
+            StateHasChanged();
         }
     }
 
@@ -45,5 +74,31 @@
             SelectedProductIndex = moveResult;
             StateHasChanged();
         }
+    }
+
+    private void AddProduct()
+    {
+        var newProduct = new Product
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "New Product",
+                Description = "Description",
+                Price = 0.0
+            };
+
+        Products.Insert(SelectedProductIndex + 1, newProduct);
+        SelectedProduct = newProduct;
+        SelectedProductIndex = SelectedProductIndex + 1;
+        StateHasChanged();
+    }
+
+    private void ShowAddProductButton()
+    {
+        AddButtonVisible = true;
+    }
+
+    private void HideAddProductButton()
+    {
+        AddButtonVisible = false;
     }
 }

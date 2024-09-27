@@ -3,7 +3,7 @@ using Data.Repository;
 
 namespace ProductsCartWeb.Repository.Interfaces
 {
-    public interface IProductRepository : IRepository<Product, Guid>
+    public interface IProductRepository : IRepository<Product>
     {
     }
 }

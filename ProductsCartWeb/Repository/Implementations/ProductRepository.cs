@@ -4,7 +4,7 @@ using ProductsCartWeb.Repository.Interfaces;
 
 namespace ProductsCartWeb.Repository.Implementations
 {
-    public class ProductRepository : BaseRepository<Product, Guid>, IProductRepository
+    public class ProductRepository : BaseRepository<Product>, IProductRepository
     {
         public ProductRepository()
         {
@@ -18,7 +18,7 @@ namespace ProductsCartWeb.Repository.Implementations
             Products = new List<Product>();
             Products.Add(new Product()
             {
-                Id = new Guid(),
+                Id = new Guid().ToString(),
                 Name = "Intel Core I5-9400F",
                 Description = "Новый процессор Intel Core i5-9400F 9-го поколения, с кодовым названием микроархитектуры Coffee Lake. Предназначен для настольной платформы Intel LGA 1151. Принадлежит к семейству высокопроизводительных процессоров Core i5.",
                 Price = 4500,
@@ -26,7 +26,7 @@ namespace ProductsCartWeb.Repository.Implementations
             });
             Products.Add(new Product()
             {
-                Id = new Guid(),
+                Id = new Guid().ToString(),
                 Name = "AMD Ryzen 5 3600",
                 Description = "Процесор AMD Ryzen 5 3600 з архітектурою Zen 2. Призначений для сокету AM4 та забезпечує високу продуктивність для настільних комп'ютерів.",
                 Price = 4800,
@@ -35,7 +35,7 @@ namespace ProductsCartWeb.Repository.Implementations
 
             Products.Add(new Product()
             {
-                Id = new Guid(),
+                Id = new Guid().ToString(),
                 Name = "Intel Core i7-9700K",
                 Description = "Процесор Intel Core i7-9700K 9-го покоління, 8 ядер і 8 потоків для максимального рівня продуктивності.",
                 Price = 9000,
@@ -44,7 +44,7 @@ namespace ProductsCartWeb.Repository.Implementations
 
             Products.Add(new Product()
             {
-                Id = new Guid(),
+                Id = new Guid().ToString(),
                 Name = "AMD Ryzen 7 3700X",
                 Description = "AMD Ryzen 7 3700X - високопродуктивний 8-ядерний процесор для ігрових та професійних систем.",
                 Price = 9500,
@@ -53,7 +53,7 @@ namespace ProductsCartWeb.Repository.Implementations
 
             Products.Add(new Product()
             {
-                Id = new Guid(),
+                Id = new Guid().ToString(),
                 Name = "Intel Core i9-9900K",
                 Description = "Флагманський процесор Intel Core i9-9900K з 8 ядрами і 16 потоками, розроблений для максимальної продуктивності.",
                 Price = 14000,
@@ -62,7 +62,7 @@ namespace ProductsCartWeb.Repository.Implementations
 
             Products.Add(new Product()
             {
-                Id = new Guid(),
+                Id = new Guid().ToString(),
                 Name = "AMD Ryzen 9 3900X",
                 Description = "12-ядерний процесор AMD Ryzen 9 3900X для робочих станцій і геймерських ПК, архітектура Zen 2.",
                 Price = 12000,
@@ -71,7 +71,7 @@ namespace ProductsCartWeb.Repository.Implementations
 
             Products.Add(new Product()
             {
-                Id = new Guid(),
+                Id = new Guid().ToString(),
                 Name = "Intel Core i5-10600K",
                 Description = "Процесор Intel Core i5-10600K для сокету LGA 1200, 6 ядер і 12 потоків, оптимальний для ігор і роботи.",
                 Price = 5600,
@@ -80,7 +80,7 @@ namespace ProductsCartWeb.Repository.Implementations
 
             Products.Add(new Product()
             {
-                Id = new Guid(),
+                Id = new Guid().ToString(),
                 Name = "AMD Ryzen 5 5600X",
                 Description = "Шестиядерний процесор AMD Ryzen 5 5600X з архітектурою Zen 3, чудово підходить для ігор.",
                 Price = 7000,
@@ -89,7 +89,7 @@ namespace ProductsCartWeb.Repository.Implementations
 
             Products.Add(new Product()
             {
-                Id = new Guid(),
+                Id = new Guid().ToString(),
                 Name = "Intel Core i7-10700F",
                 Description = "Процесор Intel Core i7-10700F з 8 ядрами та 16 потоками, без вбудованого графічного ядра.",
                 Price = 8600,
@@ -98,7 +98,7 @@ namespace ProductsCartWeb.Repository.Implementations
 
             Products.Add(new Product()
             {
-                Id = new Guid(),
+                Id = new Guid().ToString(),
                 Name = "AMD Ryzen 7 5800X",
                 Description = "8-ядерний процесор AMD Ryzen 7 5800X з архітектурою Zen 3 для геймерів і творців контенту.",
                 Price = 11500,
@@ -107,7 +107,7 @@ namespace ProductsCartWeb.Repository.Implementations
 
             Products.Add(new Product()
             {
-                Id = new Guid(),
+                Id = new Guid().ToString(),
                 Name = "Intel Core i9-11900K",
                 Description = "Флагманський процесор Intel Core i9-11900K з 8 ядрами та 16 потоками, підтримка PCIe 4.0.",
                 Price = 15500,
@@ -116,12 +116,12 @@ namespace ProductsCartWeb.Repository.Implementations
 
         }
 
-        public override Task<Product> GetAsync(Guid id)
+        public override Task<Product> GetAsync(string id)
         {
             return Task.FromResult(Products.FirstOrDefault(x => x.Id == id));
         }
 
-        public override Task<List<Product>> GetRangeAsync(List<Guid> ids)
+        public override Task<List<Product>> GetRangeAsync(List<string> ids)
         {
             return Task.FromResult(Products.FindAll(x => ids.Contains(x.Id)));
         }

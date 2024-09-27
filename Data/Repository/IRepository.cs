@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Data.Repository
 {
-    public interface IRepository<T, TId> where T : class
+    public interface IRepository<T> where T : class
     {
-        Task<T> GetAsync(TId id);
-        Task<List<T>> GetRangeAsync(List<TId> ids); 
+        Task<T> GetAsync(string id);
+        Task<List<T>> GetRangeAsync(List<string> ids); 
         Task<List<T>> GetAllAsync();
     }
 }
