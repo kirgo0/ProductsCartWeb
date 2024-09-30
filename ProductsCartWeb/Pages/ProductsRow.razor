@@ -1,4 +1,7 @@
-﻿<div class="grid @($"grid-cols-{MaxVisibleElements*2+1}") gap-4" @onmouseenter="ShowAddProductButton" @onmouseleave="HideAddProductButton">
+﻿<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+<div class="grid-cols-7 grid gap-4" @onmouseenter="ShowAddProductButton" @onmouseleave="HideAddProductButton">
     @if(SelectedProductIndex-LeftBoundary < MaxVisibleElements)
     {
         for (int i = 0; i < MaxVisibleElements - SelectedProductIndex - LeftBoundary; i++)
@@ -15,23 +18,21 @@
     {
         <ProductBlock Class="@($"opacity-{j*25}")" Product="Products[i]" />
     }
-    @if(AddButtonVisible)
-    {
         @if(RightBoundary - SelectedProductIndex < MaxVisibleElements)
         {
-            <div class="flex justify-center align-items-center">
-                <button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm p-4 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                    <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9" />
-                    </svg>
-                    <span class="sr-only">Icon description</span>
+            <div class="align-items-center flex flex-col justify-center gap-4 transition-all duration-150 ease-in-out @(AddButtonVisible ? "opacity-100" : "opacity-0")">
+                <button type="button" class="me-2 inline-flex items-center rounded-full bg-amber-300 p-4 text-center text-sm font-medium text-white drop-shadow-md transition-colors duration-100 ease-in hover:bg-amber-400 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700">
+                    <span class="material-symbols-outlined text-gray-700">
+                        add
+                    </span>
+                </button>
+                <button type="button" class="me-2 inline-flex items-center rounded-full bg-amber-200 p-2 text-center text-sm font-medium text-white drop-shadow-md transition-colors duration-100 ease-in hover:bg-amber-300 focus:outline-none">
+                    <span class="material-symbols-outlined text-gray-700">
+                        add_link
+                    </span>
                 </button>
             </div>
         }
-        <div class="absolute right-20 ">
-            
-        </div>
-    }
 </div>
 
 
