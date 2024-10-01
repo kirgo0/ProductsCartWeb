@@ -5,7 +5,7 @@ VisualStudioVersion = 17.11.35303.130
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProductsCartWeb", "ProductsCartWeb\ProductsCartWeb.csproj", "{2FA7E4D1-97F7-433B-A36D-2D6B663758D1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data", "Data\Data.csproj", "{3F03D5F8-F73D-4069-8406-E8E4949E6278}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Data", "Data\Data.csproj", "{3F03D5F8-F73D-4069-8406-E8E4949E6278}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

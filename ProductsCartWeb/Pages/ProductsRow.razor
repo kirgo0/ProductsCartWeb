@@ -1,43 +1,71 @@
-﻿<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+﻿@inject IJSRuntime _js
 
-<div class="grid-cols-7 grid gap-4" @onmouseenter="ShowAddProductButton" @onmouseleave="HideAddProductButton">
-    @if(SelectedProductIndex-LeftBoundary < MaxVisibleElements)
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<div class="w-100 relative" @onmouseenter="() => ArrowsVisible = true" @onmouseleave="() => ArrowsVisible = false">
+    @if (ArrowsVisible && SelectedProductIndex != Products.Count - 1)
     {
-        for (int i = 0; i < MaxVisibleElements - SelectedProductIndex - LeftBoundary; i++)
+        <div class="-translate-y-1/2 absolute -left-5 top-1/2 flex justify-center">
+            <button @onclick="() => Move(1)">
+                <span class="material-symbols-outlined text-center">
+                    arrow_back_ios
+                </span>
+            </button>
+        </div>
+    }
+    <div class="grid-cols-7 grid gap-4">
+        @if(SelectedProductIndex-LeftBoundary < MaxVisibleElements)
         {
-            <div> </div>
+            for (int i = 0; i < MaxVisibleElements - SelectedProductIndex - LeftBoundary; i++)
+            {
+                <ProductBlock></ProductBlock>
+            }
         }
-    }
-    @for (int i = LeftBoundary, j = Math.Abs(SelectedProductIndex - LeftBoundary - MaxVisibleElements) + 2; i < SelectedProductIndex; i++, j++)
-    { 
-        <ProductBlock Class="@($"opacity-{j*25}")" Product="Products[i]" />
-    }
-    <ProductBlock Class=@($"col-start-{MaxVisibleElements+1}") Product="Products[SelectedProductIndex]" IsSelected="true" />
-    @for (int i = SelectedProductIndex + 1, j = MaxVisibleElements+1; i <= RightBoundary; i++, j--)
+        @for (int i = LeftBoundary, j = Math.Abs(SelectedProductIndex - LeftBoundary - MaxVisibleElements) + 2; i < SelectedProductIndex; i++, j++)
+        {
+            <ProductBlock Class="@($"opacity-{j*25}")" Product="Products[i]" Index="i" OnDoubleClickAction="Select" DeleteAction="DeleteProduct" InsertItemAction="InsertProduct" />
+        }
+
+        <ProductBlock Class=@($"col-start-{MaxVisibleElements+1}") Product="Products[SelectedProductIndex]" IsSelected="true" DeleteAction="DeleteProduct" />
+
+        @for (int i = SelectedProductIndex + 1, j = MaxVisibleElements+1; i <= RightBoundary; i++, j--)
+        {
+            <ProductBlock Class="@($"opacity-{j*25}")" Product="Products[i]" Index="i" OnDoubleClickAction="Select" DeleteAction="DeleteProduct" />
+        }
+            @if(RightBoundary - SelectedProductIndex < MaxVisibleElements)
+            {
+            <div class="align-items-center flex flex-col justify-center gap-1 rounded-sm transition-all duration-150 ease-in-out @(AddButtonVisible ? "opacity-100 bg-gray-100" : "opacity-0")" @onmouseenter="ShowAddProductButton" @onmouseleave="HideAddProductButton">
+                    <button type="button" @onclick="AddProduct"
+                        class="me-2 inline-flex items-center rounded-full bg-amber-300 p-3 text-center text-sm font-medium text-white drop-shadow-md transition-colors duration-100 ease-in hover:bg-amber-400 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700">
+                        <span class="material-symbols-outlined text-gray-700">
+                            add
+                        </span>
+                    </button>
+                    <button type="button" @onclick="AddProductByUrl"
+                        class="me-2 inline-flex items-center rounded-full bg-amber-200 p-2 text-center text-sm font-medium text-white drop-shadow-md transition-colors duration-100 ease-in hover:bg-amber-300 focus:outline-none">
+                        <span class="material-symbols-outlined text-gray-700">
+                            add_link
+                        </span>
+                    </button>
+                </div>
+            }
+    </div>
+    @if (ArrowsVisible && SelectedProductIndex != 0)
     {
-        <ProductBlock Class="@($"opacity-{j*25}")" Product="Products[i]" />
+        <div class="-translate-y-1/2 absolute -right-6 top-1/2 flex justify-center">
+            <button @onclick="() => Move(-1)">
+                <span class="material-symbols-outlined text-center">
+                    arrow_forward_ios
+                </span>
+            </button>
+        </div>
     }
-        @if(RightBoundary - SelectedProductIndex < MaxVisibleElements)
-        {
-            <div class="align-items-center flex flex-col justify-center gap-4 transition-all duration-150 ease-in-out @(AddButtonVisible ? "opacity-100" : "opacity-0")">
-                <button type="button" class="me-2 inline-flex items-center rounded-full bg-amber-300 p-4 text-center text-sm font-medium text-white drop-shadow-md transition-colors duration-100 ease-in hover:bg-amber-400 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700">
-                    <span class="material-symbols-outlined text-gray-700">
-                        add
-                    </span>
-                </button>
-                <button type="button" class="me-2 inline-flex items-center rounded-full bg-amber-200 p-2 text-center text-sm font-medium text-white drop-shadow-md transition-colors duration-100 ease-in hover:bg-amber-300 focus:outline-none">
-                    <span class="material-symbols-outlined text-gray-700">
-                        add_link
-                    </span>
-                </button>
-            </div>
-        }
 </div>
 
 
 @code {
     private bool AddButtonVisible = false;
+    private bool ArrowsVisible = false;
 
     private int MaxVisibleElements = 3;
     private int LeftBoundary => 
@@ -49,6 +77,8 @@
 
     [Parameter]
     public List<Product> Products { get; set; } = new();
+    [Parameter]
+    public EventCallback<List<Product>> DeleteRow { get; set; }
 
     public Product SelectedProduct { get; set; }
 
@@ -69,10 +99,20 @@
     protected void Move(int shift)
     {
         var moveResult = SelectedProductIndex + shift;
-        if(moveResult > 0 && moveResult < Products.Count - 1)
+        if(moveResult >= 0 && moveResult < Products.Count)
         {
             SelectedProduct = Products[moveResult];
             SelectedProductIndex = moveResult;
+            StateHasChanged();
+        }
+    }
+
+    protected void Select(int index)
+    {
+        if(index >= 0 && index < Products.Count)
+        {
+            SelectedProduct = Products[index];
+            SelectedProductIndex = index;
             StateHasChanged();
         }
     }
@@ -84,6 +124,57 @@
                 Id = Guid.NewGuid().ToString(),
                 Name = "New Product",
                 Description = "Description",
+                Price = 0.0
+            };
+
+        Products.Insert(SelectedProductIndex + 1, newProduct);
+        SelectedProduct = newProduct;
+        SelectedProductIndex = SelectedProductIndex + 1;
+        StateHasChanged();
+    }
+
+    private async Task DeleteProduct(Product product)
+    {
+        if(Products.Contains(product))
+        {
+            var index = Products.IndexOf(product);
+            Products.Remove(product);
+            if(Products.Count == 0)
+            {
+                await DeleteRow.InvokeAsync(Products);
+                return;
+            }
+            if (index <= SelectedProductIndex && SelectedProductIndex != 0)
+            {
+                SelectedProductIndex--;
+                SelectedProduct = Products[SelectedProductIndex];
+            } 
+            StateHasChanged();
+        }
+    }
+
+    private void InsertProduct(DragAndDropEventArgs args)
+    {
+        if(!Products.Contains(args.Product))
+        {
+            Products.Insert(args.IndexToDrop, args.Product);
+            args.SuccessAction.Invoke();
+            StateHasChanged();
+        }
+    }
+
+    private async Task AddProductByUrl()
+    {
+        var userUrl = await _js.InvokeAsync<string>("navigator.clipboard.readText");
+        if (!Uri.TryCreate(userUrl, UriKind.Absolute, out var uriResult))
+        {
+            return;
+        }
+        var newProduct = new Product
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "New Product",
+                Description = userUrl,
                 Price = 0.0
             };
 
