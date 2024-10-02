@@ -1,0 +1,202 @@
+﻿@inject IJSRuntime _js
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+@if(Row is not null && Items.Count > 0)
+{
+    <div class="w-100 relative" @onmouseenter="() => ArrowsVisible = true" @onmouseleave="() => ArrowsVisible = false">
+        @if (ArrowsVisible && SelectedItemIndex != Items.Count - 1)
+        {
+            <div class="-translate-y-1/2 absolute -left-5 top-1/2 flex justify-center">
+                <button @onclick="() => Shift(1)">
+                    <span class="material-symbols-outlined text-center">
+                        arrow_back_ios
+                    </span>
+                </button>
+            </div>
+        }
+        <div class="grid-cols-7 grid gap-4">
+            @if(SelectedItemIndex-LeftBoundary < MaxVisibleElements)
+            {
+                for (int i = 0; i < MaxVisibleElements - SelectedItemIndex - LeftBoundary; i++)
+                {
+                    <ItemBlock></ItemBlock>
+                }
+            }
+            @for (int i = LeftBoundary, j = Math.Abs(SelectedItemIndex - LeftBoundary - MaxVisibleElements) + 2; i < SelectedItemIndex; i++, j++)
+            {
+                <ItemBlock Class="@($"opacity-{j*25}")" Item="Items[i]" Index="i" OnDoubleClickAction="Select" OnDelete="Delete" OnDrop="InsertProduct" />
+            }
+
+            <ItemBlock Class=@($"col-start-{MaxVisibleElements+1}") Item="SelectedItem" IsSelected="true" OnDelete="Delete" />
+
+            @for (int i = SelectedItemIndex + 1, j = MaxVisibleElements+1; i <= RightBoundary; i++, j--)
+            {
+                <ItemBlock Class="@($"opacity-{j*25}")" Item="Items[i]" Index="i" OnDoubleClickAction="Select" OnDelete="Delete" />
+            }
+                @if(RightBoundary - SelectedItemIndex < MaxVisibleElements)
+                {
+                <div class="align-items-center flex flex-col justify-center gap-1 rounded-sm transition-all duration-150 ease-in-out @(AddButtonVisible ? "opacity-100 bg-gray-100" : "opacity-0")" @onmouseenter="ShowAddProductButton" @onmouseleave="HideAddProductButton">
+                        <button type="button" @onclick="Add"
+                            class="me-2 inline-flex items-center rounded-full bg-amber-300 p-3 text-center text-sm font-medium text-white drop-shadow-md transition-colors duration-100 ease-in hover:bg-amber-400 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700">
+                            <span class="material-symbols-outlined text-gray-700">
+                                add
+                            </span>
+                        </button>
+                        <button type="button" @onclick="AddProductByUrl"
+                            class="me-2 inline-flex items-center rounded-full bg-amber-200 p-2 text-center text-sm font-medium text-white drop-shadow-md transition-colors duration-100 ease-in hover:bg-amber-300 focus:outline-none">
+                            <span class="material-symbols-outlined text-gray-700">
+                                add_link
+                            </span>
+                        </button>
+                    </div>
+                }
+        </div>
+        @if (ArrowsVisible && SelectedItemIndex != 0)
+        {
+            <div class="-translate-y-1/2 absolute -right-6 top-1/2 flex justify-center">
+                <button @onclick="() => Shift(-1)">
+                    <span class="material-symbols-outlined text-center">
+                        arrow_forward_ios
+                    </span>
+                </button>
+            </div>
+        }
+    </div>
+}
+
+
+@code {
+    private bool AddButtonVisible = false;
+    private bool ArrowsVisible = false;
+
+    private int MaxVisibleElements = 3;
+
+    private int LeftBoundary => 
+    SelectedItemIndex - MaxVisibleElements > 0 ? 
+    SelectedItemIndex - MaxVisibleElements : 0;
+
+    private int RightBoundary => 
+    SelectedItemIndex + MaxVisibleElements <= Items.Count - 1 ?
+    SelectedItemIndex + MaxVisibleElements : Items.Count - 1;
+
+    [Parameter]
+    public ItemRowDTO Row { get; set; }
+    [Parameter]
+    public EventCallback<ItemRowDTO> OnDeleteRow { get; set; }
+
+    public ItemDTO SelectedItem { get => Row.SelectedItem; set => Row.SelectedItem = value; }
+    public int SelectedItemIndex { get => Row.SelectedItemIndex; set => Row.SelectedItemIndex = value; }
+    public List<ItemDTO> Items { get => Row.Items; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+            if (Row is not null && !Row.Items.Any() && Row.SelectedItemIndex == -1) return;
+            var index = Items.Count / 2;
+            SelectedItem = Items[index];
+            SelectedItemIndex = index;
+            StateHasChanged();
+        }
+    }
+
+    protected void Shift(int shift)
+    {
+        var moveResult = SelectedItemIndex + shift;
+        if(moveResult >= 0 && moveResult < Items.Count)
+        {
+            SelectedItem = Items[moveResult];
+            SelectedItemIndex = moveResult;
+            StateHasChanged();
+        }
+    }
+
+    protected void Select(int index)
+    {
+        if (index >= 0 && index < Items.Count)
+        {
+            SelectedItem = Items[index];
+            SelectedItemIndex = index;
+            StateHasChanged();
+        }
+    }
+
+    private void Add()
+    {
+        var newProduct = new ItemDTO
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "New Product",
+                Description = "Description",
+                Price = 0.0
+            };
+
+        Items.Insert(SelectedItemIndex + 1, newProduct);
+        SelectedItem = newProduct;
+        SelectedItemIndex = SelectedItemIndex + 1;
+        StateHasChanged();
+    }
+
+    private async Task Delete(ItemDTO product)
+    {
+        if (Items.Contains(product))
+        {
+            var index = Items.IndexOf(product);
+            Items.Remove(product);
+            if (Items.Count == 0)
+            {
+                await OnDeleteRow.InvokeAsync(Row);
+                return;
+            }
+            if (index <= SelectedItemIndex && SelectedItemIndex != 0)
+            {
+                SelectedItemIndex--;
+                SelectedItem = Items[SelectedItemIndex];
+            } 
+            StateHasChanged();
+        }
+    }
+
+    private void InsertProduct(DragAndDropEventArgs args)
+    {
+        if(!Items.Contains(args.Product))
+        {
+            Items.Insert(args.IndexToDrop, args.Product);
+            args.SuccessAction.Invoke();
+            StateHasChanged();
+        }
+    }
+
+    private async Task AddProductByUrl()
+    {
+        var userUrl = await _js.InvokeAsync<string>("navigator.clipboard.readText");
+        if (!Uri.TryCreate(userUrl, UriKind.Absolute, out var uriResult))
+        {
+            return;
+        }
+        var newProduct = new ItemDTO
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "New Product",
+                Description = userUrl,
+                Price = 0.0
+            };
+
+        Items.Insert(SelectedItemIndex + 1, newProduct);
+        SelectedItem = newProduct;
+        SelectedItemIndex = SelectedItemIndex + 1;
+        StateHasChanged();
+    }
+
+    private void ShowAddProductButton()
+    {
+        AddButtonVisible = true;
+    }
+
+    private void HideAddProductButton()
+    {
+        AddButtonVisible = false;
+    }
+}

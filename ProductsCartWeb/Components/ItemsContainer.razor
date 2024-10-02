@@ -1,0 +1,16 @@
+﻿<div>
+    <CascadingValue Value="this">
+        @ChildContent
+    </CascadingValue>
+</div>
+
+@code {
+
+    [Parameter]
+    public List<ItemRowDTO> ItemRows { get; set; }
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    public ItemDTO Payload { get; set; }
+
+}

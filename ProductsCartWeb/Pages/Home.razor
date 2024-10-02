@@ -6,50 +6,56 @@
     <div>
         <p>Total Price: @TotalPrice</p>
     </div>
-    <div class="flex flex-col gap-4 pb-4">
-        <hr class="border-black" />
-        @foreach(var row in ProductsRows)
-        {
-            <ProductsRow Products="row" DeleteRow="DeleteRow"></ProductsRow>
-            <hr class="border-black"/>
-        }
-        <div class="flex justify-center">
-            <button @onclick="AddRow" type="button" class="ring-0 outline-0 mb-2 me-2 rounded-lg border border-amber-400 px-5 py-2.5 text-center text-sm font-medium text-gray-900 transition-colors duration-100 ease-in-out hover:text-white hover:bg-amber-300 focus:outline-0">Додати</button>
+    <ItemsContainer>
+        <div class="flex flex-col gap-4 pb-4">
+            <hr class="border-black" />
+            @foreach (var row in ItemRows)
+            {
+                <ItemsRow Row="row" OnDeleteRow="DeleteRow"></ItemsRow>
+                <hr class="border-black" />
+            }
+            <div class="flex justify-center">
+                <button @onclick="AddRow" type="button" class="ring-0 outline-0 mb-2 me-2 rounded-lg border border-amber-400 px-5 py-2.5 text-center text-sm font-medium text-gray-900 transition-colors duration-100 ease-in-out hover:text-white hover:bg-amber-300 focus:outline-0">Додати</button>
+            </div>
         </div>
-    </div>
+    </ItemsContainer>
 </div>
 
 @code {
-    List<List<Product>> ProductsRows = new ();
+    List<ItemRowDTO> ItemRows = new();
 
     public double TotalPrice => 0;
 
     protected override async Task OnInitializedAsync()
     {
-        ProductsRows.Add((await ProductsRepository.GetAllAsync()).Take(1).ToList());
-        ProductsRows.Add((await ProductsRepository.GetAllAsync()).Take(2).ToList());
-        ProductsRows.Add((await ProductsRepository.GetAllAsync()).Take(3).ToList());
-        ProductsRows.Add((await ProductsRepository.GetAllAsync()).Take(4).ToList());
-        ProductsRows.Add((await ProductsRepository.GetAllAsync()).Take(5).ToList());
-        ProductsRows.Add(await ProductsRepository.GetAllAsync());
+        ItemRows.Add(new ItemRowDTO((await ProductsRepository.GetAllAsync()).Take(1).ToList().Adapt<List<ItemDTO>>()));
+        ItemRows.Add(new ItemRowDTO((await ProductsRepository.GetAllAsync()).Take(2).ToList().Adapt<List<ItemDTO>>()));
+        ItemRows.Add(new ItemRowDTO((await ProductsRepository.GetAllAsync()).Take(3).ToList().Adapt<List<ItemDTO>>()));
+        ItemRows.Add(new ItemRowDTO((await ProductsRepository.GetAllAsync()).Take(4).ToList().Adapt<List<ItemDTO>>()));
+        ItemRows.Add(new ItemRowDTO((await ProductsRepository.GetAllAsync()).Take(5).ToList().Adapt<List<ItemDTO>>()));
+        ItemRows.Add(new ItemRowDTO((await ProductsRepository.GetAllAsync()).Adapt<List<ItemDTO>>()));
         await base.OnInitializedAsync();
     }
 
     private void AddRow()
     {
-        ProductsRows.Add(new List<Product>
-        {
-            new Product { Id = Guid.NewGuid().ToString(), Name = "New Product", Description = "Description", Price = 0.0 }
-        });
+        ItemRows.Add(
+            new ItemRowDTO(
+                new List<ItemDTO>
+                {
+                new ItemDTO { Id = Guid.NewGuid().ToString(), Name = "New Product", Description = "Description", Price = 0.0 }
+                }
+            )
+        );
 
         StateHasChanged();
     }
 
-    private void DeleteRow(List<Product> row)
+    private void DeleteRow(ItemRowDTO row)
     {
-        if (ProductsRows.Contains(row))
+        if (ItemRows.Contains(row))
         {
-            ProductsRows.Remove(row);
+            ItemRows.Remove(row);
         }
     }
 }
