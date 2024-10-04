@@ -5,15 +5,11 @@ namespace ProductsCartWeb.EventArgs
 {
     public class DragAndDropEventArgs
     {
-        public int IndexToDrop { get; set; }
-        public ItemDTO Product { get; set; }
-        public Action SuccessAction { get; set; }
+        public int RowFromIndex { get; set; } = -1;
+        public int ItemFromIndex { get; set; } = -1;
+        public int RowToIndex { get; set; } = -1;
+        public int ItemToIndex { get; set; } = -1;
 
-        public DragAndDropEventArgs(int indexToDrop, ItemDTO product, Action successAction)
-        {
-            IndexToDrop = indexToDrop;
-            Product = product;
-            SuccessAction = successAction;
-        }
+        public int[] Values { get => new[] { RowFromIndex, ItemFromIndex, RowToIndex, ItemToIndex}; }
     }
 }

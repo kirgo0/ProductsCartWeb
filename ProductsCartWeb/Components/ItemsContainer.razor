@@ -1,4 +1,7 @@
-﻿<div>
+﻿<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+<div>
     <CascadingValue Value="this">
         @ChildContent
     </CascadingValue>
@@ -11,6 +14,82 @@
     [Parameter]
     public RenderFragment ChildContent { get; set; }
 
-    public ItemDTO Payload { get; set; }
+    public DragAndDropEventArgs DragAndDropEventArgs { get; set; }
 
+    public bool TryMoveItem()
+    {
+        if (DragAndDropEventArgs is null) return false;
+
+        var rowFrom = DragAndDropEventArgs.RowFromIndex;
+        var rowTo = DragAndDropEventArgs.RowToIndex;
+        var from = DragAndDropEventArgs.ItemFromIndex;
+        var to = DragAndDropEventArgs.ItemToIndex;
+
+        // if any except of ItemToIndex equals -1 
+        if (DragAndDropEventArgs.Values.SkipLast(1).Contains(-1)) return false;
+
+        if (rowFrom == rowTo && from == to) 
+            return false;
+
+        if(rowFrom == rowTo)
+        {
+            return TrySwapItems(rowFrom, from, to);
+        } else
+        {
+            return TryMoveToAnotherRow(rowFrom, rowTo, from, to);
+        }
+    }
+
+    public bool TrySwapItems(int row, int from, int to)
+    {
+        var items = ItemRows[row].Items;
+        if(to == -1)
+        {
+            if (from > ItemRows[row].SelectedItemIndex) ItemRows[row].SelectedItemIndex++;
+            var item = ItemRows[row][from];
+            items.RemoveAt(from);
+            items.Insert(0, item);
+        }
+        else if(to == items.Count)
+        {
+            var item = ItemRows[row][from];
+            if (from < ItemRows[row].SelectedItemIndex) ItemRows[row].SelectedItemIndex--;
+            items.RemoveAt(from);
+            items.Add(item);
+            
+        }
+        else
+        {
+            var tempItem = items[to];
+            items[to] = items[from];
+            items[from] = tempItem;
+        }
+        StateHasChanged();
+        DragAndDropEventArgs = null;
+        return true;
+    }
+
+    public bool TryMoveToAnotherRow(int rowFrom, int rowTo, int from, int to)
+    {
+        var item = ItemRows[rowFrom][from];
+
+        if (to < ItemRows[rowTo].SelectedItemIndex)
+            ItemRows[rowTo].SelectedItemIndex++;
+
+        if (to == -1) to = 0;
+
+        ItemRows[rowTo].Items.Insert(to, item);
+
+        if (from <= ItemRows[rowFrom].SelectedItemIndex && ItemRows[rowFrom].SelectedItemIndex != 0)
+            ItemRows[rowFrom].SelectedItemIndex--;
+
+        ItemRows[rowFrom].Items.Remove(item);
+
+        if (ItemRows[rowFrom].Items.Count == 0) {
+            ItemRows.RemoveAt(rowFrom);
+            StateHasChanged();
+        }
+        DragAndDropEventArgs = null;
+        return true;
+    }
 }

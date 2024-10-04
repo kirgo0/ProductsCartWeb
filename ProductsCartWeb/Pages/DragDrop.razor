@@ -4,7 +4,7 @@
 <ul ondragover="event.preventDefault();" style="margin:20px">
     @foreach (var item in Games)
     {
-        if (item != null)     //Change @ondrop to @ondragover to update UI in real time
+        if (item != null)    
         {
             <li draggable="true" style="list-style-type:none; height:30px"
                 @key="item.ID" tabindex="1"

@@ -1,17 +1,20 @@
-﻿
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@40,400,0,0" />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-
-<div draggable="true" class="@Class @(Item is null ? "" : IsSelected ? "bg-amber-200" : "bg-gray-200") relative rounded p-3 shadow-sm"
-    ondragover="event.preventDefault();"
+﻿<div class="@Class @(Item is null ? "" : IsSelected ? "bg-amber-200" : "bg-gray-200") relative rounded p-3 shadow-sm"
     @ondblclick="async () => await OnDoubleClickAction.InvokeAsync(Index)"
-    @ondrag="StartDrag"
-    @ondrop="Drop" 
-    @onmouseenter="() => ShowDeleteBtn = true" 
-    @onmouseleave="() => ShowDeleteBtn = false">
-    @if (Item is not null)
+    @onmouseenter="() => ButtonsVisible = true" 
+    @onmouseleave="() => ButtonsVisible = false"
+    draggable="@(ChildContent is null && Item is not null? "true" : "false")"
+    ondragover="event.preventDefault();"
+    @ondrop="HandleDrop" 
+    @ondragenter="HandleDragEnter"
+    @ondragleave="HandleDragLeave"
+    @ondragstart="HandleDragStart"
+>
+    @if (ChildContent is not null)
     {
-        @if(ShowDeleteBtn)
+        @ChildContent
+    } else if (Item is not null)
+    {
+        @if(ButtonsVisible)
         {
             <button class="border-r-0 absolute -right-3 -top-3 h-7 w-7 rounded-full bg-red-500 text-white transition-colors duration-150" @onclick="Delete">X</button>
         }
@@ -27,37 +30,26 @@
 
 @code {
     [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    [Parameter]
     public string Class { get; set; }
-
     [Parameter]
     public ItemDTO Item { get; set; }
-
     [Parameter]
     public bool IsSelected { get; set; } = false;
-
     [Parameter]
     public int Index { get; set; } = 0;
+    [CascadingParameter]
+    public int RowIndex { get; set; }
     [Parameter]
     public EventCallback<int> OnDoubleClickAction { get; set; }
     [Parameter]
     public EventCallback<ItemDTO> OnDelete { get; set; }
-    [Parameter]
-    public EventCallback<DragAndDropEventArgs> OnDrop { get; set; }
+    [CascadingParameter]
+    public ItemsContainer Container { get; set; }
 
-    private bool ShowDeleteBtn { get; set; } = false;
+    private bool ButtonsVisible { get; set; } = false;
 
-    private async Task Drop()
-    {
-        if(Item is not null)
-        {
-            await OnDrop.InvokeAsync(new DragAndDropEventArgs(Index, Item, async () => await Delete()));
-        }
-    }
-
-    private void StartDrag()
-    {
-        Console.WriteLine("_START__");
-    }
 
     private async Task Delete()
     {
@@ -66,4 +58,37 @@
             await OnDelete.InvokeAsync(Item);
         }
     }
+
+    #region drag_n_drop
+    // if block is used as dropzone
+
+    private void HandleDragEnter()
+    {
+    }
+
+    private void HandleDragLeave()
+    {
+    }
+
+    private async Task HandleDrop()
+    {
+        Container.DragAndDropEventArgs.RowToIndex = RowIndex;
+        Container.DragAndDropEventArgs.ItemToIndex = Index;
+        if(Container.TryMoveItem())
+        {
+            StateHasChanged();
+        }
+    }
+
+    // if block is used as draggable element
+    private void HandleDragStart()
+    {
+        Container.DragAndDropEventArgs = new()
+        {
+            RowFromIndex = RowIndex,
+            ItemFromIndex = Index
+        };
+    }
+
+    #endregion
 }
