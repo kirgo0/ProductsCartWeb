@@ -3,7 +3,7 @@
 @if (Row is not null && Items.Count > 0)
 {
     <CascadingValue Value="RowIndex">
-        <div class="w-100 relative pt-3" @onmouseenter="() => ButtonsVisible = true" @onmouseleave="() => ButtonsVisible = false">
+        <div class="w-100 relative bg-white pt-3" @onmouseenter="() => ButtonsVisible = true" @onmouseleave="() => ButtonsVisible = false">
             @if (ButtonsVisible && SelectedItemIndex != Items.Count - 1)
             {
                 <div class="-translate-y-1/2 absolute -left-5 top-1/2 flex justify-center">
@@ -14,13 +14,31 @@
                     </button>
                 </div>
             }
-        <div class="@(MaxVisibleElements == 1 ? "grid-cols-1" : MaxVisibleElements == 2 ? "grid-cols-3" : MaxVisibleElements == 3 ? "grid-cols-7" : MaxVisibleElements == 4 ? "grid-cols-9" : "") grid gap-4">
+            <div class="@(MaxVisibleElements == 1 ? "grid-cols-1" : MaxVisibleElements == 2 ? "grid-cols-5" : MaxVisibleElements == 3 ? "grid-cols-7" : MaxVisibleElements == 4 ? "grid-cols-9" : "") grid gap-4">
                 @if (SelectedItemIndex - LeftBoundary < MaxVisibleElements)
                 {
-                    for (int i = 0; i < MaxVisibleElements - SelectedItemIndex - LeftBoundary; i++)
+                    for (int i = 0; i < MaxVisibleElements - SelectedItemIndex - LeftBoundary - 1; i++)
                     {
                         <ItemBlock Index="-1"></ItemBlock>
                     }
+                    <ItemBlock Index="-1">
+                        <div class="align-items-center flex h-full flex-col justify-center gap-2 rounded-sm transition-all duration-150 ease-in-out @(LeftAddButtonVisible ? "opacity-100 bg-gray-100" : "opacity-0")"
+                             @onmouseenter="() => LeftAddButtonVisible = true"
+                             @onmouseleave="() => LeftAddButtonVisible = false">
+                            <button type="button" @onclick="() => InsertAt(0)"
+                                    class="me-2 inline-flex items-center rounded-full bg-amber-300 p-3 text-center text-sm font-medium text-white drop-shadow-md transition-colors duration-100 ease-in hover:bg-amber-400 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700">
+                                <span class="material-symbols-outlined text-gray-700">
+                                    add
+                                </span>
+                            </button>
+                            <button type="button" @onclick="() => InsertAtByUrl(0)"
+                                    class="me-2 inline-flex items-center rounded-full bg-amber-200 p-2 text-center text-sm font-medium text-white drop-shadow-md transition-colors duration-100 ease-in hover:bg-amber-300 focus:outline-none">
+                                <span class="material-symbols-outlined text-gray-700">
+                                    add_link
+                                </span>
+                            </button>
+                        </div>
+                    </ItemBlock>
                 }
                 @for (int i = LeftBoundary, j = Math.Abs(SelectedItemIndex - LeftBoundary - MaxVisibleElements) + 2; i < SelectedItemIndex; i++, j++)
                 {
@@ -36,14 +54,16 @@
                 @if (RightBoundary - SelectedItemIndex < MaxVisibleElements)
                 {
                     <ItemBlock Index="Row.Count">
-                        <div class="align-items-center flex h-full flex-col justify-center gap-1 rounded-sm transition-all duration-150 ease-in-out @(AddButtonVisible ? "opacity-100 bg-gray-100" : "opacity-0")" @onmouseenter="ShowAddProductButton" @onmouseleave="HideAddProductButton">
-                            <button type="button" @onclick="Add"
+                        <div class="align-items-center flex h-full flex-col justify-center gap-2 rounded-sm transition-all duration-150 ease-in-out @(RightAddButtonVisible ? "opacity-100 bg-gray-100" : "opacity-0")"
+                             @onmouseenter="() => RightAddButtonVisible = true"
+                             @onmouseleave="() => RightAddButtonVisible = false">
+                            <button type="button" @onclick="() => InsertAt(Items.Count)"
                                     class="me-2 inline-flex items-center rounded-full bg-amber-300 p-3 text-center text-sm font-medium text-white drop-shadow-md transition-colors duration-100 ease-in hover:bg-amber-400 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700">
                                 <span class="material-symbols-outlined text-gray-700">
                                     add
                                 </span>
                             </button>
-                            <button type="button" @onclick="AddProductByUrl"
+                            <button type="button" @onclick="() => InsertAtByUrl(Items.Count)"
                                     class="me-2 inline-flex items-center rounded-full bg-amber-200 p-2 text-center text-sm font-medium text-white drop-shadow-md transition-colors duration-100 ease-in hover:bg-amber-300 focus:outline-none">
                                 <span class="material-symbols-outlined text-gray-700">
                                     add_link
@@ -56,7 +76,7 @@
                         <ItemBlock Index="Row.Count"></ItemBlock>
                     }
 
-            }
+                }
             </div>
             @if (ButtonsVisible && SelectedItemIndex != 0)
             {
@@ -68,21 +88,37 @@
                     </button>
                 </div>
             }
+
             @if (ButtonsVisible)
             {
-                <button class="border-r-0 absolute -right-3 -top-3 h-7 w-7 rounded-full bg-red-500 text-white transition-colors duration-150" @onclick="() => OnDeleteRow.InvokeAsync(Row)">X</button>
+                <div class="absolute -top-6 right-6 flex gap-1 rounded-full border border-black bg-white px-2 py-1">
+                    <button class="border-r-0 h-6 w-6 rounded-full text-sm text-gray-900" @onclick="() => OnDeleteRow.InvokeAsync(Row)">
+                        <span class="material-symbols-outlined">
+                            keyboard_arrow_down
+                        </span>
+                    </button>
+                    <button class="border-r-0 h-6 w-6 rounded-full text-sm text-gray-900" @onclick="() => OnDeleteRow.InvokeAsync(Row)">
+                        <span class="material-symbols-outlined">
+                            keyboard_arrow_up
+                        </span>
+                    </button>
+                    <button class="border-r-0 h-6 w-6 rounded-full bg-red-500 text-sm text-white transition-colors duration-150" @onclick="() => OnDeleteRow.InvokeAsync(Row)">X</button>
+
+                </div>
             }
             <hr class="mt-3 border-black" />
+
         </div>
     </CascadingValue>
 }
 
 
 @code {
-    private bool AddButtonVisible = false;
+    private bool LeftAddButtonVisible = false;
+    private bool RightAddButtonVisible = false;
     private bool ButtonsVisible = false;
 
-    private int MaxVisibleElements = 4;
+    private int MaxVisibleElements = 3;
 
     private int LeftBoundary =>
     SelectedItemIndex - MaxVisibleElements > 0 ?
@@ -133,21 +169,6 @@
         }
     }
 
-    private void Add()
-    {
-        var newProduct = new ItemDTO
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "New Product",
-                Description = "Description",
-                Price = 0.0
-            };
-
-        Items.Insert(SelectedItemIndex + 1, newProduct);
-        SelectedItemIndex = SelectedItemIndex + 1;
-        StateHasChanged();
-    }
-
     private async Task Delete(ItemDTO product)
     {
         if (Items.Contains(product))
@@ -167,8 +188,25 @@
         }
     }
 
-    private async Task AddProductByUrl()
+    private void InsertAt(int index)
     {
+        if (index < 0 || index > Items.Count) return;
+        var newProduct = new ItemDTO
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "New Product",
+                Description = "Description",
+                Price = 0.0
+            };
+
+        Items.Insert(index, newProduct);
+        if (index <= SelectedItemIndex) SelectedItemIndex++;
+        StateHasChanged();
+    }
+
+    private async Task InsertAtByUrl(int index)
+    {
+        if (index < 0 || index > Items.Count - 1) return;
         var userUrl = await _js.InvokeAsync<string>("navigator.clipboard.readText");
         if (!Uri.TryCreate(userUrl, UriKind.Absolute, out var uriResult))
         {
@@ -182,18 +220,9 @@
                 Price = 0.0
             };
 
-        Items.Insert(SelectedItemIndex + 1, newProduct);
-        SelectedItemIndex = SelectedItemIndex + 1;
+        Items.Insert(index, newProduct);
+        if (index <= SelectedItemIndex) SelectedItemIndex++;
         StateHasChanged();
     }
 
-    private void ShowAddProductButton()
-    {
-        AddButtonVisible = true;
-    }
-
-    private void HideAddProductButton()
-    {
-        AddButtonVisible = false;
-    }
 }
