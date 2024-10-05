@@ -7,11 +7,10 @@
         <p>Total Price: @TotalPrice</p>
     </div>
     <ItemsContainer ItemRows="ItemRows">
-        <div class="flex flex-col pb-4">
-            <hr class="border-black" />
+        <div class="grid auto-rows-fr pb-4">
             @for (int i = 0; i < ItemRows.Count; i++)
             {
-                <ItemsRow Row="ItemRows[i]" OnDeleteRow="DeleteRow" RowIndex="i"></ItemsRow>
+                <ItemsRow Row="ItemRows[i]" OnDeleteRow="DeleteRow" OnMoveRowUp="MoveRowUp" OnMoveRowDown="MoveRowDown" RowIndex="i"></ItemsRow>
             }
             <div class="flex justify-center pt-3">
                 <button @onclick="AddRow" type="button" class="ring-0 outline-0 mb-2 me-2 rounded-lg border border-amber-400 px-5 py-2.5 text-center text-sm font-medium text-gray-900 transition-colors duration-100 ease-in-out hover:text-white hover:bg-amber-300 focus:outline-0">Додати</button>
@@ -56,5 +55,14 @@
         {
             ItemRows.Remove(row);
         }
+    }
+
+    private void MoveRowUp(ItemRowDTO row)
+    {
+    }
+
+    private void MoveRowDown(ItemRowDTO row)
+    {
+
     }
 }

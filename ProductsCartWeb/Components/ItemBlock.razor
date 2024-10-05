@@ -5,9 +5,8 @@
     draggable="@(ChildContent is null && Item is not null? "true" : "false")"
     ondragover="event.preventDefault();"
     @ondrop="HandleDrop" 
-    @ondragenter="HandleDragEnter"
-    @ondragleave="HandleDragLeave"
     @ondragstart="HandleDragStart"
+    @ondragend="HandleDragEnd"
 >
     @if (ChildContent is not null)
     {
@@ -83,11 +82,17 @@
     // if block is used as draggable element
     private void HandleDragStart()
     {
+        ButtonsVisible = false;
         Container.DragAndDropEventArgs = new()
         {
             RowFromIndex = RowIndex,
             ItemFromIndex = Index
         };
+    }
+
+    private void HandleDragEnd()
+    {
+        Container.DragAndDropEventArgs = null;
     }
 
     #endregion

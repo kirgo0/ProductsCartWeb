@@ -3,84 +3,29 @@
 @if (Row is not null && Items.Count > 0)
 {
     <CascadingValue Value="RowIndex">
-        <div class="w-100 relative bg-white pt-3" @onmouseenter="() => ButtonsVisible = true" @onmouseleave="() => ButtonsVisible = false">
+        <div class="w-100 relative bg-white px-5 pt-3" @onmouseenter="() => ButtonsVisible = true" @onmouseleave="() => ButtonsVisible = false">
             @if (ButtonsVisible && SelectedItemIndex != Items.Count - 1)
             {
-                <div class="-translate-y-1/2 absolute -left-5 top-1/2 flex justify-center">
+                <div class="-translate-y-1/2 absolute left-4 top-1/2 flex-col justify-center justify-items-center gap-2">
+                
+                    @if (Items.Count - RightBoundary - 1 > 0) {
+                        <div class="text-center">+@(Items.Count - RightBoundary - 1)</div>
+                    }
                     <button @onclick="() => Shift(1)">
-                        <span class="material-symbols-outlined text-center">
+                        <span class="material-symbols-outlined">
                             arrow_back_ios
                         </span>
                     </button>
                 </div>
             }
-            <div class="@(MaxVisibleElements == 1 ? "grid-cols-1" : MaxVisibleElements == 2 ? "grid-cols-5" : MaxVisibleElements == 3 ? "grid-cols-7" : MaxVisibleElements == 4 ? "grid-cols-9" : "") grid gap-4">
-                @if (SelectedItemIndex - LeftBoundary < MaxVisibleElements)
-                {
-                    for (int i = 0; i < MaxVisibleElements - SelectedItemIndex - LeftBoundary - 1; i++)
-                    {
-                        <ItemBlock Index="-1"></ItemBlock>
-                    }
-                    <ItemBlock Index="-1">
-                        <div class="align-items-center flex h-full flex-col justify-center gap-2 rounded-sm transition-all duration-150 ease-in-out @(LeftAddButtonVisible ? "opacity-100 bg-gray-100" : "opacity-0")"
-                             @onmouseenter="() => LeftAddButtonVisible = true"
-                             @onmouseleave="() => LeftAddButtonVisible = false">
-                            <button type="button" @onclick="() => InsertAt(0)"
-                                    class="me-2 inline-flex items-center rounded-full bg-amber-300 p-3 text-center text-sm font-medium text-white drop-shadow-md transition-colors duration-100 ease-in hover:bg-amber-400 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700">
-                                <span class="material-symbols-outlined text-gray-700">
-                                    add
-                                </span>
-                            </button>
-                            <button type="button" @onclick="() => InsertAtByUrl(0)"
-                                    class="me-2 inline-flex items-center rounded-full bg-amber-200 p-2 text-center text-sm font-medium text-white drop-shadow-md transition-colors duration-100 ease-in hover:bg-amber-300 focus:outline-none">
-                                <span class="material-symbols-outlined text-gray-700">
-                                    add_link
-                                </span>
-                            </button>
-                        </div>
-                    </ItemBlock>
-                }
-                @for (int i = LeftBoundary, j = Math.Abs(SelectedItemIndex - LeftBoundary - MaxVisibleElements) + 2; i < SelectedItemIndex; i++, j++)
-                {
-                    <ItemBlock Class="@($"opacity-{j*25}")" Item="Items[i]" Index="i" OnDoubleClickAction="Select" OnDelete="Delete" />
-                }
 
-                <ItemBlock Class=@($"col-start-{MaxVisibleElements+1}") Item="SelectedItem" Index="SelectedItemIndex" IsSelected="true" OnDelete="Delete" />
-
-                @for (int i = SelectedItemIndex + 1, j = MaxVisibleElements + 1; i <= RightBoundary; i++, j--)
-                {
-                    <ItemBlock Class="@($"opacity-{j*25}")" Item="Items[i]" Index="i" OnDoubleClickAction="Select" OnDelete="Delete" />
-                }
-                @if (RightBoundary - SelectedItemIndex < MaxVisibleElements)
-                {
-                    <ItemBlock Index="Row.Count">
-                        <div class="align-items-center flex h-full flex-col justify-center gap-2 rounded-sm transition-all duration-150 ease-in-out @(RightAddButtonVisible ? "opacity-100 bg-gray-100" : "opacity-0")"
-                             @onmouseenter="() => RightAddButtonVisible = true"
-                             @onmouseleave="() => RightAddButtonVisible = false">
-                            <button type="button" @onclick="() => InsertAt(Items.Count)"
-                                    class="me-2 inline-flex items-center rounded-full bg-amber-300 p-3 text-center text-sm font-medium text-white drop-shadow-md transition-colors duration-100 ease-in hover:bg-amber-400 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700">
-                                <span class="material-symbols-outlined text-gray-700">
-                                    add
-                                </span>
-                            </button>
-                            <button type="button" @onclick="() => InsertAtByUrl(Items.Count)"
-                                    class="me-2 inline-flex items-center rounded-full bg-amber-200 p-2 text-center text-sm font-medium text-white drop-shadow-md transition-colors duration-100 ease-in hover:bg-amber-300 focus:outline-none">
-                                <span class="material-symbols-outlined text-gray-700">
-                                    add_link
-                                </span>
-                            </button>
-                        </div>
-                    </ItemBlock>
-                    @for (int i = 0; i < MaxVisibleElements - (RightBoundary - SelectedItemIndex) - 1; i++)
-                    {
-                        <ItemBlock Index="Row.Count"></ItemBlock>
-                    }
-
-                }
-            </div>
             @if (ButtonsVisible && SelectedItemIndex != 0)
             {
-                <div class="-translate-y-1/2 absolute -right-6 top-1/2 flex justify-center">
+                <div class="-translate-y-1/2 absolute right-3 top-1/2 flex-col justify-center gap-2">
+                    @if (LeftBoundary > 0)
+                    {
+                        <div class="text-center">+@LeftBoundary</div>
+                    }
                     <button @onclick="() => Shift(-1)">
                         <span class="material-symbols-outlined text-center">
                             arrow_forward_ios
@@ -88,26 +33,98 @@
                     </button>
                 </div>
             }
-
             @if (ButtonsVisible)
             {
-                <div class="absolute -top-6 right-6 flex gap-1 rounded-full border border-black bg-white px-2 py-1">
-                    <button class="border-r-0 h-6 w-6 rounded-full text-sm text-gray-900" @onclick="() => OnDeleteRow.InvokeAsync(Row)">
-                        <span class="material-symbols-outlined">
-                            keyboard_arrow_down
-                        </span>
-                    </button>
-                    <button class="border-r-0 h-6 w-6 rounded-full text-sm text-gray-900" @onclick="() => OnDeleteRow.InvokeAsync(Row)">
-                        <span class="material-symbols-outlined">
-                            keyboard_arrow_up
-                        </span>
-                    </button>
+                <div class="z-10 absolute -top-1.5 right-20 flex gap-1 rounded-full border border-black bg-white px-2 py-1">
+                    @if (Container.Count - 1 > RowIndex)
+                    {
+                        <!--move down button-->
+                        <button class="border-r-0 h-6 w-6 rounded-full text-sm text-gray-900" @onclick="() => OnMoveRowDown.InvokeAsync(Row)">
+                            <span class="material-symbols-outlined">
+                                keyboard_arrow_down
+                            </span>
+                        </button>
+                    }
+                    @if(RowIndex > 0)
+                    {
+                        <!--move up button-->
+                        <button class="border-r-0 h-6 w-6 rounded-full text-sm text-gray-900" @onclick="() => OnMoveRowUp.InvokeAsync(Row)">
+                            <span class="material-symbols-outlined">
+                                keyboard_arrow_up
+                            </span>
+                        </button> 
+                    }
                     <button class="border-r-0 h-6 w-6 rounded-full bg-red-500 text-sm text-white transition-colors duration-150" @onclick="() => OnDeleteRow.InvokeAsync(Row)">X</button>
 
                 </div>
             }
-            <hr class="mt-3 border-black" />
+            <div class="flex h-full flex-col justify-stretch">
+                <hr class="mb-3 border-black" />
+                <div class="@(MaxVisibleElements == 1 ? "grid-cols-1" : MaxVisibleElements == 2 ? "grid-cols-5" : MaxVisibleElements == 3 ? "grid-cols-7" : MaxVisibleElements == 4 ? "grid-cols-9" : "") grid h-full gap-4">
+                    @if (SelectedItemIndex - LeftBoundary < MaxVisibleElements)
+                    {
+                        for (int i = 0; i < MaxVisibleElements - SelectedItemIndex - LeftBoundary - 1; i++)
+                        {
+                            <ItemBlock Index="-1"></ItemBlock>
+                        }
+                        <ItemBlock Index="-1">
+                            <div class="align-items-center flex h-full flex-col justify-center gap-2 rounded-sm transition-all duration-150 ease-in-out @(LeftAddButtonVisible ? "opacity-100 bg-gray-100" : "opacity-0")"
+                                 @onmouseenter="() => LeftAddButtonVisible = true"
+                                 @onmouseleave="() => LeftAddButtonVisible = false">
+                                <button type="button" @onclick="() => InsertAt(0)"
+                                        class="me-2 inline-flex items-center rounded-full bg-amber-300 p-3 text-center text-sm font-medium text-white drop-shadow-md transition-colors duration-100 ease-in hover:bg-amber-400 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700">
+                                    <span class="material-symbols-outlined text-gray-700">
+                                        add
+                                    </span>
+                                </button>
+                                <button type="button" @onclick="() => InsertAtByUrl(0)"
+                                        class="me-2 inline-flex items-center rounded-full bg-amber-200 p-2 text-center text-sm font-medium text-white drop-shadow-md transition-colors duration-100 ease-in hover:bg-amber-300 focus:outline-none">
+                                    <span class="material-symbols-outlined text-gray-700">
+                                        add_link
+                                    </span>
+                                </button>
+                            </div>
+                        </ItemBlock>
+                    }
+                    @for (int i = LeftBoundary, j = Math.Abs(SelectedItemIndex - LeftBoundary - MaxVisibleElements) + 2; i < SelectedItemIndex; i++, j++)
+                    {
+                        <ItemBlock Class="@($"opacity-{j*25}")" Item="Items[i]" Index="i" OnDoubleClickAction="Select" OnDelete="Delete" />
+                    }
 
+                    <ItemBlock Class=@($"col-start-{MaxVisibleElements+1}") Item="SelectedItem" Index="SelectedItemIndex" IsSelected="true" OnDelete="Delete" />
+
+                    @for (int i = SelectedItemIndex + 1, j = MaxVisibleElements + 1; i <= RightBoundary; i++, j--)
+                    {
+                        <ItemBlock Class="@($"opacity-{j*25}")" Item="Items[i]" Index="i" OnDoubleClickAction="Select" OnDelete="Delete" />
+                    }
+                    @if (RightBoundary - SelectedItemIndex < MaxVisibleElements)
+                    {
+                        <ItemBlock Index="Row.Count">
+                            <div class="align-items-center flex h-full flex-col justify-center gap-2 rounded-sm transition-all duration-150 ease-in-out @(RightAddButtonVisible ? "opacity-100 bg-gray-100" : "opacity-0")"
+                                 @onmouseenter="() => RightAddButtonVisible = true"
+                                 @onmouseleave="() => RightAddButtonVisible = false">
+                                <button type="button" @onclick="() => InsertAt(Items.Count)"
+                                        class="me-2 inline-flex items-center rounded-full bg-amber-300 p-3 text-center text-sm font-medium text-white drop-shadow-md transition-colors duration-100 ease-in hover:bg-amber-400 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700">
+                                    <span class="material-symbols-outlined text-gray-700">
+                                        add
+                                    </span>
+                                </button>
+                                <button type="button" @onclick="() => InsertAtByUrl(Items.Count)"
+                                        class="me-2 inline-flex items-center rounded-full bg-amber-200 p-2 text-center text-sm font-medium text-white drop-shadow-md transition-colors duration-100 ease-in hover:bg-amber-300 focus:outline-none">
+                                    <span class="material-symbols-outlined text-gray-700">
+                                        add_link
+                                    </span>
+                                </button>
+                            </div>
+                        </ItemBlock>
+                        @for (int i = 0; i < MaxVisibleElements - (RightBoundary - SelectedItemIndex) - 1; i++)
+                        {
+                            <ItemBlock Index="Row.Count"></ItemBlock>
+                        }
+
+                    }
+                </div>
+            </div>
         </div>
     </CascadingValue>
 }
@@ -134,6 +151,12 @@
     public int RowIndex { get; set; }
     [Parameter]
     public EventCallback<ItemRowDTO> OnDeleteRow { get; set; }
+    [Parameter]
+    public EventCallback<ItemRowDTO> OnMoveRowUp { get; set; }
+    [Parameter]
+    public EventCallback<ItemRowDTO> OnMoveRowDown { get; set; }
+    [CascadingParameter]
+    public ItemsContainer Container { get; set; }
 
     public ItemDTO SelectedItem { get => Row.SelectedItem; }
     public int SelectedItemIndex { get => Row.SelectedItemIndex; set => Row.SelectedItemIndex = value; }
@@ -206,7 +229,7 @@
 
     private async Task InsertAtByUrl(int index)
     {
-        if (index < 0 || index > Items.Count - 1) return;
+        if (index < 0 || index > Items.Count) return;
         var userUrl = await _js.InvokeAsync<string>("navigator.clipboard.readText");
         if (!Uri.TryCreate(userUrl, UriKind.Absolute, out var uriResult))
         {
