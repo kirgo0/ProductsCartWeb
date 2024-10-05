@@ -5,6 +5,7 @@
         public List<ItemDTO> Items { get; set; } = new List<ItemDTO>();
         public int SelectedItemIndex { get; set; } = -1;
         public int Count => Items.Count;
+        public string? RowName { get; set; }
         public ItemDTO SelectedItem
         {
             get
@@ -17,7 +18,6 @@
         {
             get => Items[index];
         }
-
         public ItemRowDTO(List<ItemDTO> items) 
         {
             Items = items;

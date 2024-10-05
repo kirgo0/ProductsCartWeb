@@ -3,20 +3,20 @@
 @using ProductsCartWeb.Repository.Interfaces
 
 <div>
-    <div>
-        <p>Total Price: @TotalPrice</p>
-    </div>
-    <ItemsContainer ItemRows="ItemRows">
-        <div class="grid auto-rows-fr pb-4">
-            @for (int i = 0; i < ItemRows.Count; i++)
-            {
-                <ItemsRow Row="ItemRows[i]" OnDeleteRow="DeleteRow" OnMoveRowUp="MoveRowUp" OnMoveRowDown="MoveRowDown" RowIndex="i"></ItemsRow>
-            }
-            <div class="flex justify-center pt-3">
-                <button @onclick="AddRow" type="button" class="ring-0 outline-0 mb-2 me-2 rounded-lg border border-amber-400 px-5 py-2.5 text-center text-sm font-medium text-gray-900 transition-colors duration-100 ease-in-out hover:text-white hover:bg-amber-300 focus:outline-0">Додати</button>
+    <div class="grid-cols-7 grid">
+        <ItemsContainer Class="col-span-5" ItemRows="ItemRows">
+            <div class="grid auto-rows-fr pb-4">
+                @for (int i = 0; i < ItemRows.Count; i++)
+                {
+                    <ItemsRow Row="ItemRows[i]" OnDeleteRow="DeleteRow" OnMoveRowUp="MoveRowUp" OnMoveRowDown="MoveRowDown" RowIndex="i"></ItemsRow>
+                }
+                <div class="flex justify-center pt-3">
+                    <button @onclick="AddRow" type="button" class="ring-0 outline-0 mb-2 me-2 rounded-lg border border-amber-400 px-5 py-2.5 text-center text-sm font-medium text-gray-900 transition-colors duration-100 ease-in-out hover:text-white hover:bg-amber-300 focus:outline-0">Додати</button>
+                </div>
             </div>
-        </div>
-    </ItemsContainer>
+        </ItemsContainer>
+    </div>
+    
 </div>
 
 @code {
@@ -59,10 +59,21 @@
 
     private void MoveRowUp(ItemRowDTO row)
     {
+        var rowIndex = ItemRows.IndexOf(row);
+        if(rowIndex > 0)
+        {
+            ItemRows.Remove(row);
+            ItemRows.Insert(rowIndex-1, row);
+        }
     }
 
     private void MoveRowDown(ItemRowDTO row)
     {
-
+        var rowIndex = ItemRows.IndexOf(row);
+        if (rowIndex < ItemRows.Count-1)
+        {
+            ItemRows.Remove(row);
+            ItemRows.Insert(rowIndex + 1, row);
+        }
     }
 }
