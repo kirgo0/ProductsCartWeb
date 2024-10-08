@@ -1,7 +1,4 @@
-﻿using Data.Models;
-using ProductsCartWeb.Dtos;
-
-namespace ProductsCartWeb.EventArgs
+﻿namespace ProductsCartWeb.EventArgs
 {
     public class DragAndDropEventArgs
     {
@@ -10,6 +7,6 @@ namespace ProductsCartWeb.EventArgs
         public int RowToIndex { get; set; } = -1;
         public int ItemToIndex { get; set; } = -1;
 
-        public int[] Values { get => new[] { RowFromIndex, ItemFromIndex, RowToIndex, ItemToIndex}; }
+        public int[] Values { get => new[] { RowFromIndex, ItemFromIndex, RowToIndex, ItemToIndex }; }
     }
 }

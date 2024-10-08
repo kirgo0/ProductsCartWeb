@@ -18,7 +18,7 @@
         {
             get => Items[index];
         }
-        public ItemRowDTO(List<ItemDTO> items) 
+        public ItemRowDTO(List<ItemDTO> items)
         {
             Items = items;
         }
