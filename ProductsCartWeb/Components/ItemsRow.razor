@@ -34,7 +34,7 @@
             }
             @if (ButtonsVisible)
             {
-                <div class="z-10 absolute -top-1.5 right-20 flex gap-1 rounded-full border border-black bg-white px-2 py-1">
+                <div class="z-10 absolute @(!string.IsNullOrEmpty(Row.RowName) || ChangingRowName ? "top-2"  : "-top-1.5") right-20 flex gap-1 rounded-full border border-black bg-white px-2 py-1">
                     @if (Container.Count - 1 > RowIndex)
                     {
                         <!--move down button-->
@@ -60,8 +60,13 @@
             <div class="flex h-full flex-col justify-stretch">
                 @if (!ChangingRowName && string.IsNullOrEmpty(Row.RowName) && ButtonsVisible)
                 {
-                <div class="z-10 absolute left-12 top-0 rounded-full border border-black bg-white py-1 pl-3 pr-2">
-                    <button class="text-center" @onclick="() => ChangingRowName = true">
+                    <div class="z-10 absolute left-12 top-0 rounded-full border border-black bg-white py-1 pl-3 pr-2">
+                        <!--add category name button-->
+                        <button class="text-center" @onclick="async () => {
+                            ChangingRowName = true;
+                            await ChangeNameInputWidth();
+                            await ChangeNameInputFocus();
+                        }">
                             Додати ім'я
                             <span class="material-symbols-outlined align-middle">
                                 edit
@@ -72,12 +77,31 @@
 
                 @if (!string.IsNullOrEmpty(Row.RowName) || ChangingRowName)
                 {
-                    <div>
-                        <input @onblur="() => ChangingRowName = false" class="bg-red-300 outline-0 min-w-2" type="text" @bind-value="Row.RowName" />
-                        <button class="text-center" @onclick="() => ChangingRowName = true">
-                            <span class="material-symbols-outlined align-middle">
-                                edit
-                            </span>
+                    <div class="relative">
+                        <!--category name input-->
+                        <input type="text"
+                            @ref="nameInput"
+                            @oninput="ChangeNameInputWidth" 
+                            @onblur="() => ChangingRowName = false" class="outline-0 inline-block w-10"  
+                            @bind-value="Row.RowName" 
+                            @onclick="() => ChangingRowName = true"
+                            placeholder="Ім'я категорії" 
+                            autofocus/>
+                        <button class="text-center" @onclick="async () => { 
+                            ChangingRowName = !ChangingRowName;
+                            await ChangeNameInputFocus();
+                        }">
+                            @if(ChangingRowName)
+                            {
+                                <span class="material-symbols-outlined align-middle">
+                                    check
+                                </span>
+                            } else
+                            {
+                                <span class="material-symbols-outlined align-middle">
+                                    edit
+                                </span>
+                            }
                         </button>
                     </div>
                 }
@@ -157,6 +181,8 @@
     private bool RightAddButtonVisible = false;
     private bool ButtonsVisible = false;
     private bool ChangingRowName = false;
+
+    private ElementReference nameInput { get; set; }
 
     private int MaxVisibleElements = 2;
 
@@ -271,4 +297,16 @@
         StateHasChanged();
     }
 
+    private async Task ChangeNameInputWidth()
+    {
+        if(nameInput.Context is not null)
+            await _js.InvokeVoidAsync("adjustWidthOfInput", nameInput);
+        // StateHasChanged();
+    }
+
+    private async Task ChangeNameInputFocus()
+    {
+        if(nameInput.Context is not null)
+            await nameInput.FocusAsync();
+    }
 }
